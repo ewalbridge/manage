@@ -1,2 +1,2 @@
-/etc/sysctl.conf
+nano /etc/sysctl.conf
 net.ipv4.conf.default.rp_filter=2

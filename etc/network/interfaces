@@ -5,14 +5,28 @@
 auto lo
 iface lo inet loopback
 
+# Physical External Interface
 auto eth0
 iface eth0 inet dhcp
-  post-up /bin/ip link add name br0 type bridge
-  post-up /bin/ip link set dev br0 up
-  post-up /bin/ip addr add 192.168.10.1/24 broadcast 192.168.10.255 dev br0
-  post-up /sbin/iptables -t nat -A POSTROUTING -s 192.168.10.0/24 ! -d 192.168.10.0/24 -j MASQUERADE
-  post-up /sbin/iptables -A FORWARD -o br0 -j ACCEPT
-  post-up /sbin/iptables -A FORWARD -i br0 -j ACCEPT
   
-  post-up /bin/ip link add name br1 type bridge
-  post-up /bin/ip link set dev br1 up
+  # Virtual External vSwitch
+  post-up /bin/ip link add name vext type bridge
+  post-up /bin/ip link set dev vext up
+  post-up /bin/ip link set dev vext address $(/usr/local/sbin/mac-address eth0 1 255 4)
+  post-up /bin/ip addr add 169.254.254.254/24 broadcast 169.254.254.255 dev vext
+  # iptables rules
+  post-up /sbin/iptables -t nat -A POSTROUTING -s 169.254.254.0/24 ! -d 169.254.254.0/24 -j MASQUERADE
+  post-up /sbin/iptables -A FORWARD -o vext -j ACCEPT
+  post-up /sbin/iptables -A FORWARD -i vext -j ACCEPT
+  
+  # Virtual Internal vSwitch
+  post-up /bin/ip link add name vint type bridge
+  post-up /bin/ip link set dev vint up
+  post-up /bin/ip link set dev vint address $(/usr/local/sbin/mac-address eth0 2 255 4)
+  post-up /bin/ip addr add 169.254.253.254/24 broadcast 169.254.253.255 dev vint
+  
+  # Virtual Management vSwitch
+  post-up /bin/ip link add name vman type bridge
+  post-up /bin/ip link set dev vman up
+  post-up /bin/ip link set dev vman address $(/usr/local/sbin/mac-address eth0 3 255 4)
+  post-up /bin/ip addr add 169.254.252.254/24 broadcast 169.254.252.255 dev vman

@@ -1,14 +1,42 @@
-lxc.network.type = veth
-lxc.network.veth.pair = br0_p0
-lxc.network.flags = up
-lxc.network.link = br0
-lxc.network.hwaddr = 00:16:3e:b4:4d:b8
-lxc.network.ipv4 = 192.168.10.100/24
-lxc.network.ipv4.gateway = 192.168.10.1
+# Template used to create this container: /usr/share/lxc/templates/lxc-ubuntu
+# Parameters passed to the template:
+# For additional config options, please look at lxc.container.conf(5)
 
+# Common configuration
+lxc.include = /usr/share/lxc/config/ubuntu.common.conf
+
+# Container specific configuration
+lxc.rootfs = /var/lib/lxc/firewall/rootfs
+lxc.mount = /var/lib/lxc/firewall/fstab
+lxc.utsname = firewall
+lxc.arch = amd64
+
+# External Network Configuration
 lxc.network.type = veth
-lxc.network.veth.pair = br1_p0
+lxc.network.name = vext-e0
+lxc.network.veth.pair = vext-p0
 lxc.network.flags = up
-lxc.network.link = br1
-lxc.network.hwaddr = 00:16:3e:b4:4d:b9
-lxc.network.ipv4 = 192.168.20.100/24
+lxc.network.link = vext
+lxc.network.ipv4 = 169.254.254.253/24
+lxc.network.ipv4.gateway = 169.254.254.254
+#lxc.network.script.up = "/var/lib/lxc/firewall/up-vext-e0"
+
+# Internal Network Configuration
+lxc.network.type = veth
+lxc.network.name = vint-e0
+lxc.network.veth.pair = vint-p0
+lxc.network.flags = up
+lxc.network.link = vint
+lxc.network.ipv4 = 169.254.253.253/24
+#lxc.network.script.up = "/var/lib/lxc/firewall/up-vint-e0"
+
+# Management Network Configuration
+lxc.network.type = veth
+lxc.network.name = vman-e0
+lxc.network.veth.pair = vman-p0
+lxc.network.flags = up
+lxc.network.link = vman
+lxc.network.ipv4 = 169.254.252.253/24
+#lxc.network.script.up = "/var/lib/lxc/firewall/up-vman-e0"
+
+#lxc.network.hwaddr = 0a:00:00:00:00:00

@@ -1,0 +1,1 @@
+http://serverfault.com/questions/429461/no-tun-device-in-lxc-guest-for-openvpn
